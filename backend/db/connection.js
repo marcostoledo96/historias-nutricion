@@ -31,11 +31,25 @@ pool
     try {
       console.error('❌ Error conectando a PostgreSQL:', err.message, '\nDetalles:', safeConfig);
       if (err.code === 'ENOTFOUND') {
+        const host = safeConfig.host || '(no definido)';
         console.error(
           'ℹ️  Sugerencias: verifica que el hostname sea correcto (sin espacios extra) y que tu conexión a Internet o DNS pueda resolverlo.',
-          `En Windows puedes probar con "Resolve-DnsName ${safeConfig.host}" y en macOS/Linux con "nslookup" o "dig".\n` +
+          `En Windows puedes probar con "Resolve-DnsName ${host}" y en macOS/Linux con "nslookup" o "dig".\n` +
             'Si usas Supabase, copia la cadena desde Project settings → Database → Connection string (formato db.<ref>.supabase.co).'
         );
+
+        if (typeof host === 'string' && host.includes('.supabase.co')) {
+          const supabaseMatch = host.match(/^db\.([a-z0-9-]+)\.supabase\.co$/i);
+          if (supabaseMatch) {
+            console.error(
+              `🔍 Host Supabase detectado con project ref "${supabaseMatch[1]}". Comprueba que coincida exactamente con el Project ref que muestra la consola de Supabase (Settings → General).`
+            );
+          } else {
+            console.error(
+              '🔍 El hostname parece de Supabase pero no respeta el patrón db.<project-ref>.supabase.co; revisa que no falten ni sobren letras.'
+            );
+          }
+        }
       }
     } catch (_) {
       console.error('❌ Error conectando a PostgreSQL:', err.message);

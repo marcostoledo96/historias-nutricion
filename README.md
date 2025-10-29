@@ -36,7 +36,7 @@ AUTO_OPEN=0        # 1 para abrir navegador al iniciar
 Notas importantes:
 - La conexión implementa SSL robusto por defecto; para proveedores con certificados no verificados, se usa `rejectUnauthorized=false` cuando corresponde.
 - El servidor escucha `process.env.PORT || 3000` (recomendado: 3000 fijo para desarrollo local).
-- Si obtienes `getaddrinfo ENOTFOUND`, confirma que el hostname esté bien escrito (sin espacios) y que tu DNS pueda resolverlo. En Windows prueba `Resolve-DnsName db.tu-proyecto.supabase.co`; en macOS/Linux usa `nslookup`/`dig`. Si persiste, copia nuevamente la cadena desde Supabase → Project settings → Database → Connection string o ejecuta `npm run db:diagnose` dentro de `backend/` para ver un chequeo automático de DNS/TLS.
+- Si obtienes `getaddrinfo ENOTFOUND`, confirma que el hostname esté bien escrito (sin espacios) y que tu DNS pueda resolverlo. El hostname de Supabase siempre sigue el formato `db.<project-ref>.supabase.co`; si ves letras repetidas o diferentes al `Project ref` mostrado en la consola de Supabase, vuelve a copiar la cadena. En Windows prueba `Resolve-DnsName db.<project-ref>.supabase.co`; en macOS/Linux usa `nslookup`/`dig`. Si persiste, copia nuevamente la cadena desde Supabase → Project settings → Database → Connection string o ejecuta `npm run db:diagnose` dentro de `backend/` para ver un chequeo automático de DNS/TLS.
 
 ## Instalación
 
