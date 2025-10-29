@@ -1,0 +1,37 @@
+@startuml
+' Diagrama 02 - Recuperar contraseña
+title 02 - Recuperar contraseña
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Solicita "Olvidé mi contraseña" con email
+Web -> Server : POST /auth/recuperar { email }
+Server -> DB : SELECT * FROM usuarios WHERE email = ?
+DB --> Server : registro_usuario
+alt usuario existe
+  Server -> Server : Genera token temporal (expiry)
+  Server -> DB : UPDATE usuarios SET token_recuperacion = ? WHERE id = ?
+  Server -> Web : HTTP 200 OK { mensaje: "Se envió correo de recuperación" }
+  Web --> Doctor : Indica revisar correo
+  ' Usuario hace clic en enlace (token)
+  Doctor -> Web : Accede enlace de recuperación (token)
+  Web -> Server : GET /auth/reset?token=ABC
+  Server -> DB : SELECT * FROM usuarios WHERE token_recuperacion = ?
+  DB --> Server : registro_usuario
+  alt token válido
+    Web -> Server : POST /auth/reset { token, nueva_password }
+    Server -> DB : UPDATE usuarios SET password = ?, token_recuperacion = NULL WHERE id = ?
+    DB --> Server : OK
+    Server --> Web : HTTP 200 OK { mensaje: "Contraseña actualizada" }
+    Web --> Doctor : Muestra confirmación
+  else token inválido/expirado
+    Server --> Web : HTTP 400 Bad Request { error: "Token inválido o expirado" }
+    Web --> Doctor : Muestra error
+  end
+else usuario no existe
+  Server --> Web : HTTP 404 Not Found { error: "Email no registrado" }
+  Web --> Doctor : Muestra mensaje
+end
+@enduml

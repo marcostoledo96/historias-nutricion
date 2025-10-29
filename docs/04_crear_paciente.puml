@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 04 - Crear paciente
+title 04 - Crear paciente
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Abrir formulario "Nuevo paciente"
+Web -> Server : POST /pacientes { nombre, apellido, documento, fn, telefono, cobertura }
+Server -> DB : SELECT * FROM pacientes WHERE documento = ?
+DB --> Server : resultado
+alt documento no existe
+  Server -> DB : INSERT INTO pacientes (...)
+  DB --> Server : id_paciente
+  Server --> Web : HTTP 201 Created { id_paciente, mensaje: "Paciente creado" }
+  Web --> Doctor : Redirige a ficha del paciente
+else documento duplicado
+  Server --> Web : HTTP 409 Conflict { error: "Paciente ya registrado" }
+  Web --> Doctor : Muestra alerta
+end
+@enduml

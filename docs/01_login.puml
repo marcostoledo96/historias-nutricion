@@ -1,0 +1,26 @@
+@startuml
+' Diagrama 01 - Login del doctor
+title 01 - Login del doctor
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Ingresa email y contraseña
+Web -> Server : POST /login { email, password }
+Server -> DB : SELECT * FROM usuarios WHERE email = ?
+DB --> Server : registro_usuario
+alt usuario encontrado
+  Server -> Server : Verifica password (hash)
+  alt password correcto
+    Server --> Web : HTTP 200 OK { token: JWT, nombre, rol }
+  Web --> Doctor : Redirige a inicio
+  else password incorrecto
+    Server --> Web : HTTP 401 Unauthorized { error: "Credenciales inválidas" }
+    Web --> Doctor : Muestra mensaje de error
+  end
+else usuario no encontrado
+  Server --> Web : HTTP 404 Not Found { error: "Usuario no encontrado" }
+  Web --> Doctor : Muestra mensaje de error
+end
+@enduml

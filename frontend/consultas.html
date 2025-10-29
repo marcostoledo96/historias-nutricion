@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--
+  ! Página: Consultas
+  * Propósito: listar/filtrar consultas y crear nuevas
+  * Scripts: utils.js, auth.js, components.js, selector_pacientes.js, consultas.js
+  ? Secciones: filtros por fecha/ID, tabla de consultas, card de nueva consulta
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultas - Sistema de Historias Clínicas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">assignment</span> Consultas</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="filtro-fecha">Por fecha</label>
+              <input id="filtro-fecha" type="date" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="filtro-id-paciente">Por ID Paciente</label>
+              <input id="filtro-id-paciente" type="number" class="form-input" placeholder="Ej: 1" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acciones</label>
+              <div class="flex flex-wrap gap-4 gap-sm-2">
+                <button id="btn-filtrar-fecha" class="btn btn-primary btn-field">Filtrar fecha</button>
+                <button id="btn-filtrar-paciente" class="btn btn-secondary btn-field">Filtrar paciente</button>
+                <button id="btn-todas" class="btn btn-field">Todas</button>
+                <button id="btn-nueva-consulta" class="btn btn-success btn-field"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nueva Consulta</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="table-container">
+              <table class="table" id="tabla-consultas">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Paciente</th>
+                    <th>Motivo</th>
+                    <th>Diagnóstico</th>
+                    <th>Tratamiento</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="consultas-tbody"></tbody>
+              </table>
+            </div>
+            <div id="paginacion-consultas" class="flex gap-2 mt-2"></div>
+            <div id="sin-consultas" class="text-center p-4 text-gray-500 hidden">No hay consultas para mostrar</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="card-nueva-consulta" class="card mt-4 hidden">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nueva Consulta</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-nueva-consulta">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Paciente</label>
+                <div class="flex gap-4">
+                  <input id="paciente-display-consulta" class="form-input" placeholder="Selecciona un paciente" readonly />
+                  <button type="button" id="btn-seleccionar-paciente-consulta" class="btn btn-field">Seleccionar</button>
+                </div>
+                <input name="id_paciente" type="hidden" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fecha</label>
+                <input name="fecha" type="date" class="form-input" required />
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Motivo de consulta</label>
+                <textarea name="motivo_consulta" class="form-input" rows="2" required></textarea>
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Diagnóstico</label>
+                <textarea name="diagnostico" class="form-input" rows="2"></textarea>
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Tratamiento</label>
+                <textarea name="tratamiento" class="form-input" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="button" id="btn-cancelar-consulta" class="btn btn-secondary btn-field">Cancelar</button>
+              <button type="submit" id="btn-guardar-consulta" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/selector_pacientes.js"></script>
+  <script src="js/consultas.js"></script>
+</body>
+</html>

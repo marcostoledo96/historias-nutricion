@@ -1,0 +1,20 @@
+@startuml
+' Diagrama 12 - Visualizar turnos del día
+title 12 - Visualizar turnos del día
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Abre sección "Turnos del día"
+Web -> Server : GET /turnos?fecha={hoy}
+Server -> DB : SELECT * FROM turnos WHERE fecha = CURRENT_DATE AND id_doctor = ?
+DB --> Server : lista_turnos
+alt hay turnos
+  Server --> Web : HTTP 200 OK { turnos[] }
+  Web --> Doctor : Muestra grilla con estados y horarios
+else sin turnos
+  Server --> Web : HTTP 204 No Content
+  Web --> Doctor : Muestra "No hay turnos cargados"
+end
+@enduml

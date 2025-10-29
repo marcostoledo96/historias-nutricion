@@ -1,0 +1,41 @@
+<!--
+  ! Componente: Header
+  * Propósito: navegación principal + menú de usuario + toggle de tema
+  * Dependencias JS: components.js (interacciones), auth.js (estado de usuario)
+  ? Elementos esperados por JS: #btn-nav-toggle, #nav-menu, #btn-toggle-theme, #user-menu-button, #user-menu-dropdown, #usuario-nombre
+-->
+<header class="header">
+  <div class="header-container">
+    <a href="inicio.html" class="logo" title="Inicio">
+      <span class="logo-icon material-symbols-outlined" aria-hidden="true">medication</span>
+      <span class="logo-text">Historias Clínicas</span>
+    </a>
+
+  <button id="btn-nav-toggle" class="nav-toggle" aria-label="Abrir menú" aria-controls="nav-menu" aria-expanded="false"><span class="material-symbols-outlined" aria-hidden="true">menu</span></button>
+
+    <nav id="nav-menu" class="nav-menu">
+  <a href="inicio.html" class="nav-link"><span class="material-symbols-outlined" aria-hidden="true">home</span> <span>Inicio</span></a>
+  <a href="pacientes.html" class="nav-link"><span class="material-symbols-outlined" aria-hidden="true">group</span> <span>Pacientes</span></a>
+  <!-- Consultas ocultado temporalmente por pedido del usuario -->
+  <!-- <a href="consultas.html" class="nav-link"><span class="material-symbols-outlined" aria-hidden="true">assignment</span> <span>Consultas</span></a> -->
+  <a href="turnos.html" class="nav-link"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> <span>Turnos</span></a>
+  <!-- Configuración removido del menú principal por pedido del usuario -->
+    </nav>
+
+    <div class="header-actions">
+  <button id="btn-toggle-theme" class="btn btn-secondary" title="Alternar tema"><span class="material-symbols-outlined" aria-hidden="true">dark_mode</span></button>
+      <div class="user-menu">
+        <button id="user-menu-button" class="user-avatar" aria-haspopup="true" aria-expanded="false" title="Menú de usuario">
+          <span id="user-menu-initials" class="user-initials" aria-hidden="true">DR</span>
+          <span id="user-menu-label" class="user-name">Dr. Usuario</span>
+          <span class="material-symbols-outlined chevron" aria-hidden="true">expand_more</span>
+        </button>
+        <div id="user-menu-dropdown" class="user-dropdown hidden" role="menu">
+          <div class="user-info-line"><span id="usuario-nombre">Dr. Usuario</span></div>
+          <a href="configuracion.html" class="dropdown-item" role="menuitem"><span class="material-symbols-outlined" aria-hidden="true">settings</span> Configuración</a>
+          <button id="btn-logout" class="dropdown-item" role="menuitem"><span class="material-symbols-outlined" aria-hidden="true">logout</span> Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

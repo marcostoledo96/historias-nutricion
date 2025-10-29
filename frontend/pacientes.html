@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!--
+  ! Página: Pacientes
+  * Propósito: buscar/listar pacientes y realizar altas/ediciones desde la misma vista
+  * Scripts: utils.js, auth.js, components.js, pacientes.js
+  ? Secciones: filtros y acciones, tabla de pacientes, cards de detalle/alta/edición
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pacientes - Sistema de Historias Clínicas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!--
+    ! Página: Pacientes
+    * Scripts: utils.js, auth.js, components.js, pacientes.js
+    ? Notas: búsqueda con debounce, paginación simple en tabla, acciones responsive
+  -->
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">group</span> Pacientes</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group w-full">
+              <label class="form-label" for="busqueda">Buscar por nombre, apellido o DNI</label>
+              <input id="busqueda" class="form-input" placeholder="Ej: Juan, Pérez, 12345678" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acciones</label>
+              <div class="flex flex-wrap gap-4 gap-sm-2">
+                <button id="btn-buscar" class="btn btn-primary btn-field"><span class="material-symbols-outlined" aria-hidden="true">search</span> Buscar</button>
+                <button id="btn-nuevo" class="btn btn-success btn-field"><span class="material-symbols-outlined" aria-hidden="true">person_add</span> Nuevo Paciente</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel-listado" class="mt-4">
+            <div class="table-container">
+              <table class="table" id="tabla-pacientes">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Teléfono</th>
+                    <th>Cobertura</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="pacientes-tbody"></tbody>
+              </table>
+            </div>
+            <div id="paginacion" class="flex gap-2 mt-2"></div>
+            <div id="sin-pacientes" class="text-center p-4 text-gray-500 hidden">No hay pacientes para mostrar</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="card-detalle" class="card mt-4 hidden">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">description</span> Detalle del paciente</h3>
+        </div>
+        <div class="card-body" id="detalle-paciente"></div>
+      </div>
+
+      <div id="card-nuevo" class="card mt-4 hidden">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">person_add</span> Nuevo Paciente</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-nuevo-paciente">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input name="nombre" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Apellido</label>
+                <input name="apellido" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">DNI</label>
+                <input name="dni" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fecha de nacimiento</label>
+                <input name="fecha_nacimiento" type="date" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sexo</label>
+                <select name="sexo" class="form-select">
+                  <option value="masculino">Masculino</option>
+                  <option value="femenino">Femenino</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input name="telefono" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input name="email" type="email" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cobertura</label>
+                <input name="cobertura" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Plan</label>
+                <input name="plan" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° Afiliado</label>
+                <input name="numero_afiliado" class="form-input" />
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Dirección</label>
+                <input name="direccion" class="form-input" />
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="button" id="btn-cancelar-nuevo" class="btn btn-secondary btn-field">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="card-editar" class="card mt-4 hidden">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar Paciente</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-editar-paciente">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Nombre</label>
+                <input name="nombre" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Apellido</label>
+                <input name="apellido" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">DNI</label>
+                <input name="dni" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Fecha de nacimiento</label>
+                <input name="fecha_nacimiento" type="date" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sexo</label>
+                <select name="sexo" class="form-select">
+                  <option value="masculino">Masculino</option>
+                  <option value="femenino">Femenino</option>
+                  <option value="otro">Otro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Teléfono</label>
+                <input name="telefono" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input name="email" type="email" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cobertura</label>
+                <input name="cobertura" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Plan</label>
+                <input name="plan" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">N° Afiliado</label>
+                <input name="numero_afiliado" class="form-input" />
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Dirección</label>
+                <input name="direccion" class="form-input" />
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="button" id="btn-cancelar-editar" class="btn btn-secondary btn-field">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-field">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/pacientes.js"></script>
+</body>
+</html>

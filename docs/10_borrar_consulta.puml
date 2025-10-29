@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 10 - Borrar consulta
+title 10 - Borrar consulta
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Solicita eliminar consulta (confirmación)
+Web -> Server : DELETE /consultas/{id}
+Server -> DB : SELECT * FROM consultas WHERE id = ?
+DB --> Server : consulta_existente
+alt existe y puede borrarse
+  Server -> DB : DELETE FROM consultas WHERE id = ?
+  DB --> Server : OK
+  Server --> Web : HTTP 200 OK { mensaje: "Consulta eliminada" }
+  Web --> Doctor : Actualiza historial
+else no existe
+  Server --> Web : HTTP 404 Not Found { error: "Consulta no encontrada" }
+  Web --> Doctor : Muestra mensaje
+end
+@enduml

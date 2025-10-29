@@ -1,0 +1,23 @@
+@startuml
+' Diagrama 03 - Crear usuario (registro)
+title 03 - Crear usuario
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Formulario registro (nombre, email, password, rol)
+Web -> Server : POST /usuarios { nombre, email, password, rol }
+Server -> DB : SELECT * FROM usuarios WHERE email = ?
+DB --> Server : resultado
+alt email no existe
+  Server -> Server : Hashea password
+  Server -> DB : INSERT INTO usuarios (...)
+  DB --> Server : id_usuario
+  Server --> Web : HTTP 201 Created { id_usuario, mensaje: "Usuario creado" }
+  Web --> Doctor : Muestra confirmación
+else email duplicado
+  Server --> Web : HTTP 409 Conflict { error: "Email ya registrado" }
+  Web --> Doctor : Muestra alerta
+end
+@enduml

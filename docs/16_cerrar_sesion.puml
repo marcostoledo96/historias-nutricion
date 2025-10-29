@@ -1,0 +1,18 @@
+@startuml
+' Diagrama 16 - Cerrar sesión
+title 16 - Cerrar sesión
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+
+Doctor -> Web : Clic en "Cerrar sesión"
+Web -> Server : POST /logout { token }
+Server -> Server : Invalida token (blacklist) o lo elimina
+alt token válido
+  Server --> Web : HTTP 200 OK { mensaje: "Sesión cerrada" }
+  Web --> Doctor : Redirige a login
+else token inválido/expirado
+  Server --> Web : HTTP 401 Unauthorized { error: "Sesión no válida" }
+  Web --> Doctor : Redirige a login
+end
+@enduml

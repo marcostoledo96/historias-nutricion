@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema de Historias Clínicas</title>
+    <link rel="stylesheet" href="css/styles.css">
+        <script>
+            // Aplicar tema guardado lo antes posible para evitar parpadeos
+            (function(){
+                try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
+            })();
+        </script>
+        <!--
+            ! Página: Login
+            * Propósito: iniciar sesión en el sistema; si ya hay sesión activa, redirige a inicio
+            * Scripts clave: utils.js (alertas, helpers), auth.js (verificar/cerrar sesión)
+            ? Recordatorio: los inputs tienen data-no-autofill en componentes si se usa layout; aquí se usa un formulario simple
+        -->
+    
+</head>
+<body>
+        <button id="theme-toggle-standalone" class="theme-standalone-btn" aria-label="Alternar tema" title="Alternar tema">
+            <span class="material-symbols-outlined" aria-hidden="true">dark_mode</span>
+        </button>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1><span class="material-symbols-outlined" aria-hidden="true">medication</span> Historias Clínicas</h1>
+                <p>Ingresa tus credenciales para acceder</p>
+            </div>
+            
+            <form id="loginForm">
+                <div id="alert-container"></div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="doctor@clinica.com"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Ingresa tu contraseña"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group login-remember">
+                    <input type="checkbox" id="remember" name="remember" />
+                    <label for="remember" class="form-label" style="margin:0;">Mantener sesión iniciada</label>
+                </div>
+
+                <button type="submit" id="btnLogin" class="btn btn-primary w-full btn-inline">
+                    <span id="login-text">Iniciar Sesión</span>
+                    <span id="login-loading" class="loading hidden" aria-hidden="true"></span>
+                </button>
+            </form>
+            
+            <div class="login-help">
+                <p><strong>Credenciales de prueba:</strong></p>
+                <p>Email: doctor@clinica.com</p>
+                <p>Contraseña: password123</p>
+                <div class="links">
+                    <a href="recuperar.html" class="text-link">¿Olvidaste tu contraseña?</a>
+                     · 
+                    <a href="registro.html" class="text-link">Crear usuario</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Verificar si ya está autenticado
+        document.addEventListener('DOMContentLoaded', async () => {
+            const authStatus = await verificarAutenticacion();
+            if (authStatus.autenticado) {
+                    window.location.href = 'inicio.html';
+            }
+        });
+
+        // Manejo del formulario de login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btnLogin = document.getElementById('btnLogin');
+            const loginText = document.getElementById('login-text');
+            const loginLoading = document.getElementById('login-loading');
+            
+            // Mostrar loading
+            btnLogin.disabled = true;
+            loginText.classList.add('hidden');
+            loginLoading.classList.remove('hidden');
+            
+            try {
+                const formData = new FormData(e.target);
+                const loginData = {
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    remember: formData.get('remember') ? true : false
+                };
+                
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(loginData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    mostrarAlerta('Login exitoso. Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'inicio.html';
+                    }, 1000);
+                } else {
+                    mostrarAlerta(result.error || 'Error al iniciar sesión', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarAlerta('Error de conexión. Intenta nuevamente.', 'error');
+            } finally {
+                // Ocultar loading
+                btnLogin.disabled = false;
+                loginText.classList.remove('hidden');
+                loginLoading.classList.add('hidden');
+            }
+        });
+
+                // Toggle de tema standalone
+                (function(){
+                    const btn = document.getElementById('theme-toggle-standalone');
+                    if (!btn) return;
+                    const icon = btn.querySelector('.material-symbols-outlined');
+                    const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
+                    const setIcon = () => {
+                        const t = getTheme();
+                        icon.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
+                        btn.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+                        btn.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+                    };
+                    setIcon();
+                    btn.addEventListener('click', () => {
+                        const current = getTheme();
+                        const next = current === 'dark' ? 'light' : 'dark';
+                        document.documentElement.setAttribute('data-theme', next);
+                        try { localStorage.setItem('theme', next); } catch(e) {}
+                        setIcon();
+                    });
+                })();
+    </script>
+</body>
+</html>

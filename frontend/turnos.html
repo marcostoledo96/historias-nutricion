@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+  ! Página: Turnos del día
+  * Propósito: listar y gestionar turnos por fecha, con navegación de días y acciones de estado
+  * Scripts: utils.js, auth.js, components.js, selector_pacientes.js, turnos.js
+  ? Secciones: action bar de fecha, tabla de turnos, leyenda de estados
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Turnos - Sistema de Historias Clínicas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos</h2>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="dia">Día</label>
+              <div class="flex gap-2 items-center">
+                <button id="btn-dia-anterior" class="btn btn-field" title="Ver día anterior"><span class="material-symbols-outlined" aria-hidden="true">chevron_left</span></button>
+                <input id="dia" type="date" class="form-input" />
+                <button id="btn-dia-siguiente" class="btn btn-field" title="Ver día siguiente"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></button>
+              </div>
+              <small class="text-muted">Cambia la fecha para ver los turnos de otros días.</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Ver</label>
+              <div class="flex flex-wrap gap-4 gap-sm-2">
+                <button id="btn-ver-hoy" class="btn btn-primary btn-field">Hoy</button>
+                <button id="btn-ver-dia" class="btn btn-secondary btn-field">Aplicar fecha</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="paciente-filtro">Nombre o Apellido</label>
+              <div class="flex gap-4">
+                <input id="paciente-filtro" type="text" class="form-input" placeholder="Ej: Juan o Pérez" />
+                <button id="btn-filtrar-paciente" class="btn btn-field">Filtrar</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acciones</label>
+              <div class="flex flex-wrap gap-4 gap-sm-2">
+                <button id="btn-nuevo-turno" class="btn btn-success btn-field"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="table-container">
+              <table class="table" id="tabla-turnos">
+                <thead>
+                  <tr>
+                    <th>Hora</th>
+                    <th>Paciente</th>
+                    <th>DNI</th>
+                    <th>Cobertura</th>
+                    <th>Situación</th>
+                    <th>Llegada</th>
+                    <th>1ra vez</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="turnos-tbody"></tbody>
+              </table>
+            </div>
+            <!-- Paginación removida: se muestran todos los turnos del día -->
+            <div id="sin-turnos" class="text-center p-4 text-gray-500 hidden">No hay turnos para mostrar</div>
+              <div class="mt-4 text-sm text-gray-500">
+                Leyenda de estados:
+                <span class="badge badge-programado">Programado</span>
+                <span class="badge badge-en-espera">En Espera</span>
+                <span class="badge badge-atendido">Atendido</span>
+                <span class="badge badge-ausente">Ausente</span>
+                <span class="badge badge-cancelado">Cancelado</span>
+              </div>
+          </div>
+        </div>
+      </div>
+
+  <!-- Formulario inline de nuevo turno deshabilitado: ahora se usa una ventana nueva (turno_nuevo.html) -->
+  <div id="card-nuevo-turno" class="card mt-4 hidden" style="display:none;">
+        <div class="card-header">
+          <h3 class="card-title"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-nuevo-turno">
+            <!-- Fila 1: Paciente con autocompletado -->
+            <div class="form-row">
+              <div class="form-group w-full relative">
+                <label class="form-label">Paciente</label>
+                <div class="flex gap-4 items-center">
+                  <div class="w-full relative">
+                    <input id="paciente-input" class="form-input" placeholder="Nombre o apellido del paciente..." autocomplete="off" />
+                    <div id="paciente-sugerencias" class="hidden suggestion-panel"></div>
+                  </div>
+                  <button type="button" id="btn-seleccionar-paciente-turno" class="btn btn-field">Seleccionar</button>
+                </div>
+                <input name="id_paciente" type="hidden" required />
+                <div class="text-sm mt-1">Escribe para ver sugerencias y elige; o usa "Seleccionar". Si no existe, se creará automáticamente al guardar el turno.</div>
+              </div>
+            </div>
+
+            <!-- Fila 2: Cobertura, Día, Hora -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Cobertura</label>
+                <input name="cobertura" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Día</label>
+                <input name="dia" type="date" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Horario</label>
+                <input name="horario" type="time" class="form-input" required />
+              </div>
+            </div>
+
+            <!-- Fila 3: Detalle grande y 1ra vez -->
+            <div class="form-row">
+              <div class="form-group w-full">
+                <label class="form-label">Detalle</label>
+                <textarea name="detalle" class="form-input" rows="5" placeholder="Notas del turno, motivo, etc."></textarea>
+              </div>
+              <div class="form-group login-remember">
+                <label class="form-label" for="primera_vez">1ra vez</label>
+                <input id="primera_vez" name="primera_vez" type="checkbox" />
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="button" id="btn-cancelar-turno" class="btn btn-secondary btn-field">Cancelar</button>
+              <button type="submit" id="btn-guardar-turno" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/selector_pacientes.js"></script>
+  <script src="js/turnos.js"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 05 - Editar paciente
+title 05 - Editar paciente
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Abre ficha y edita datos
+Web -> Server : PUT /pacientes/{id} { nombre, apellido, telefono, cobertura }
+Server -> DB : SELECT * FROM pacientes WHERE id = ?
+DB --> Server : registro_paciente
+alt paciente existe
+  Server -> DB : UPDATE pacientes SET ... WHERE id = ?
+  DB --> Server : OK
+  Server --> Web : HTTP 200 OK { mensaje: "Paciente actualizado" }
+  Web --> Doctor : Muestra confirmación
+else no existe
+  Server --> Web : HTTP 404 Not Found { error: "Paciente no encontrado" }
+  Web --> Doctor : Muestra error
+end
+@enduml

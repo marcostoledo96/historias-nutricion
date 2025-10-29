@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 15 - Borrar turno del día
+title 15 - Borrar turno del día
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Solicita eliminar turno (confirmación)
+Web -> Server : DELETE /turnos/{id}
+Server -> DB : SELECT * FROM turnos WHERE id = ?
+DB --> Server : turno_existente
+alt existe
+  Server -> DB : DELETE FROM turnos WHERE id = ?
+  DB --> Server : OK
+  Server --> Web : HTTP 200 OK { mensaje: "Turno eliminado" }
+  Web --> Doctor : Actualiza grilla
+else no existe
+  Server --> Web : HTTP 404 Not Found { error: "Turno no encontrado" }
+  Web --> Doctor : Muestra error
+end
+@enduml

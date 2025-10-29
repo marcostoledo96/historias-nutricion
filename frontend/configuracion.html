@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuración - Sistema de Historias Clínicas</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!--
+    ! Página: Configuración
+    * Propósito: actualizar datos del perfil, cambiar contraseña y preferencias locales
+    * Scripts: utils.js, auth.js, components.js, configuracion.js
+    ? Requiere sesión activa; accede a /api/auth/perfil y /api/auth/password
+  -->
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">settings</span> Configuración de la cuenta</h2>
+          <p class="text-gray-600">Actualiza tus datos personales y preferencias</p>
+        </div>
+        <div class="card-body">
+          <form id="form-perfil">
+            <div class="form-row">
+              <div class="form-group w-full">
+                <label class="form-label">Nombre completo</label>
+                <input name="nombre" class="form-input" required />
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Email</label>
+                <input name="email" type="email" class="form-input" required />
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" id="btn-guardar-perfil" class="btn btn-primary btn-field"><span class="material-symbols-outlined" aria-hidden="true">save</span> Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">lock</span> Cambiar contraseña</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-password">
+            <div class="form-row">
+              <div class="form-group w-full">
+                <label class="form-label">Contraseña actual</label>
+                <input name="password_actual" type="password" class="form-input" required />
+              </div>
+              <div class="form-group w-full">
+                <label class="form-label">Nueva contraseña</label>
+                <input name="password_nueva" type="password" class="form-input" required />
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" id="btn-guardar-password" class="btn btn-secondary btn-field"><span class="material-symbols-outlined" aria-hidden="true">key</span> Actualizar contraseña</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">tune</span> Preferencias</h3>
+        </div>
+        <div class="card-body">
+          <form id="form-preferencias">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Tema</label>
+                <select name="tema" class="form-select">
+                  <option value="claro">Claro</option>
+                  <option value="oscuro">Oscuro</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Abrir Inicio al entrar</label>
+                <input name="auto_inicio" type="checkbox" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Elementos por página (listados)</label>
+                <select name="page_size" class="form-select">
+                  <option value="5">5</option>
+                  <option value="10" selected>10</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" id="btn-guardar-pref" class="btn btn-field">Guardar preferencias</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/configuracion.js"></script>
+</body>
+</html>

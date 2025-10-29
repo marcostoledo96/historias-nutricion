@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 06 - Borrar paciente
+title 06 - Borrar paciente
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Solicita eliminar paciente (confirmación)
+Web -> Server : DELETE /pacientes/{id}
+Server -> DB : SELECT COUNT(*) FROM consultas WHERE id_paciente = ?
+DB --> Server : cantidad_consultas
+alt tiene consultas asociadas (cantidad_consultas > 0)
+  Server --> Web : HTTP 409 Conflict { error: "No puede eliminarse: tiene consultas registradas" }
+  Web --> Doctor : Muestra advertencia
+else sin consultas
+  Server -> DB : DELETE FROM pacientes WHERE id = ?
+  DB --> Server : OK
+  Server --> Web : HTTP 200 OK { mensaje: "Paciente eliminado" }
+  Web --> Doctor : Actualiza lista
+end
+@enduml

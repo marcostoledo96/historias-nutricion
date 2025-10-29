@@ -1,0 +1,14 @@
+{
+  "jest.rootPath": "backend",
+  "jest.jestCommandLine": "npm test --",
+  "jest.runMode": {
+    "type": "watch",
+    "watch": {
+      "onSave": "test-file",
+      "autoEnable": true
+    }
+  },
+  "jest.nodeEnv": {
+    "PGSSLMODE": "no-verify"
+  }
+}

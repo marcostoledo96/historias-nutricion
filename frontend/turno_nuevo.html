@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+  ! Página: Nuevo Turno (ventana separada)
+  * Propósito: crear un turno sin crear paciente automáticamente (usa nombre/apellido temporales si no se selecciona paciente)
+  * Scripts: utils.js, auth.js, components.js, selector_pacientes.js, turno_nuevo.js
+  ? Secciones: formulario del turno, autocompletado y selector, acciones de guardar/cerrar
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuevo Turno</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Ajuste mínimo para centrar el formulario en la ventana nueva */
+    .content { max-width: 1000px; margin: 0 auto; }
+  </style>
+  </head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card mt-4">
+        <div class="card-header">
+          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</h2>
+        </div>
+        <div class="card-body">
+          <form id="form-nuevo-turno">
+            <!-- Paciente con autocompletado y selector -->
+            <div class="form-row">
+              <div class="form-group w-full relative">
+                <label class="form-label">Paciente</label>
+                <div class="flex gap-4 items-center">
+                  <div class="w-full relative">
+                    <input id="paciente-input" class="form-input" placeholder="Nombre o apellido del paciente..." autocomplete="off" />
+                    <div id="paciente-sugerencias" class="hidden suggestion-panel"></div>
+                  </div>
+                  <button type="button" id="btn-seleccionar-paciente-turno" class="btn btn-field">Seleccionar</button>
+                </div>
+                <input name="id_paciente" type="hidden" />
+                <div class="text-sm mt-1 text-gray-600">Si no existe perfil, ingresa nombre y apellido (no se creará el perfil automáticamente).</div>
+              </div>
+            </div>
+
+            <!-- Cobertura, Día, Hora -->
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Cobertura</label>
+                <input name="cobertura" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Día</label>
+                <input name="dia" type="date" class="form-input" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Horario</label>
+                <input name="horario" type="time" class="form-input" autocomplete="off" required />
+              </div>
+            </div>
+
+            <!-- Detalle y 1ra vez -->
+            <div class="form-row">
+              <div class="form-group w-full">
+                <label class="form-label">Detalle</label>
+                <textarea name="detalle" class="form-input" rows="4" placeholder="Notas del turno, motivo, etc."></textarea>
+              </div>
+              <div class="form-group login-remember">
+                <label class="form-label" for="primera_vez">1ra vez</label>
+                <input id="primera_vez" name="primera_vez" type="checkbox" />
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="flex gap-2">
+                <button type="button" id="btn-volver-turnos" class="btn btn-field">Volver a Turnos</button>
+                <button type="button" id="btn-cancelar-turno" class="btn btn-secondary btn-field">Cerrar</button>
+              </div>
+              <div style="flex:1"></div>
+              <button type="submit" id="btn-guardar-turno" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/selector_pacientes.js"></script>
+  <script src="js/turno_nuevo.js"></script>
+</body>
+</html>

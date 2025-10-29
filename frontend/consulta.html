@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <!--
+    ! Página: Consulta (ver/editar/crear)
+    * Propósito: gestionar consultas médicas; modo según query string (id, nuevo=1&id_paciente)
+    * Scripts: utils.js, auth.js, components.js, consulta.js
+    ? Contratos: GET/POST/PUT /api/consultas; GET /api/pacientes/:id para autocompletar
+  -->
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="flex justify-between items-center">
+            <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">assignment</span> Consulta</h2>
+            <button id="btn-ver-perfil-consulta" class="btn">Ver perfil</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="form-consulta">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Consulta</legend>
+              <!-- Primer renglón: Paciente (Apellido, Nombre), Cobertura, Plan, Número de afiliado (todos no editables) -->
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Paciente</label><input name="paciente" class="form-input" disabled /></div>
+                <div class="form-group"><label class="form-label">Cobertura</label><input name="cobertura" class="form-input" disabled /></div>
+                <div class="form-group"><label class="form-label">Plan</label><input name="plan" class="form-input" disabled /></div>
+                <div class="form-group"><label class="form-label">N° Afiliado</label><input name="numero_afiliado" class="form-input" disabled /></div>
+              </div>
+
+              <!-- Segundo renglón (Clínica): Sexo, Fecha de nacimiento (+ edad), Enfermedades preexistentes (todos no editables) -->
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Sexo</label><input name="sexo" class="form-input" disabled /></div>
+                <div class="form-group"><label class="form-label">Fecha de nacimiento</label>
+                  <div class="flex gap-2 items-center">
+                    <input name="fecha_nacimiento" type="date" class="form-input" disabled />
+                    <span id="edad-consulta" class="text-muted" style="min-width: 90px;"></span>
+                  </div>
+                </div>
+                <div class="form-group col-span-2"><label class="form-label">Enfermedades preexistentes</label><input name="enfermedades_preexistentes" class="form-input" disabled /></div>
+              </div>
+
+              <!-- Tercer renglón: Fecha de la consulta (1/4), Motivo (3/4) -->
+              <div class="form-row form-row-1434">
+                <div class="form-group"><label class="form-label">Fecha de consulta</label><input name="fecha" type="date" class="form-input" /></div>
+                <div class="form-group"><label class="form-label">Motivo de consulta</label><textarea name="motivo_consulta" class="form-input" rows="1"></textarea></div>
+              </div>
+
+              <!-- Cuarto renglón: Informe (full width, 3 filas) -->
+              <div class="form-row">
+                <div class="form-group w-full"><label class="form-label">Informe</label><textarea name="informe_medico" class="form-input" rows="3"></textarea></div>
+              </div>
+
+              <!-- Quinto renglón: solo Diagnóstico (1 fila de altura) -->
+              <div class="form-row">
+                <div class="form-group w-full"><label class="form-label">Diagnóstico</label><textarea name="diagnostico" class="form-input" rows="1"></textarea></div>
+              </div>
+
+              <!-- Sexto renglón: Otros estudios y Tratamiento (2 filas cada uno) -->
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Otros estudios</label><textarea name="estudios" class="form-input" rows="2"></textarea></div>
+                <div class="form-group"><label class="form-label">Tratamiento</label><textarea name="tratamiento" class="form-input" rows="2"></textarea></div>
+              </div>
+            </fieldset>
+            <div class="card-footer">
+              <button type="button" id="btn-volver-consulta" class="btn btn-field">Volver</button>
+              <button type="submit" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/consulta.js"></script>
+</body>
+</html>

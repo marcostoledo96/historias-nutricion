@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Sistema de Historias Clínicas</title>
+    <link rel="stylesheet" href="css/styles.css">
+        <!--
+            ! Página: Inicio (Dashboard)
+            * Propósito: mostrar resumen del día (stats, turnos de hoy) y accesos rápidos
+            * Scripts: utils.js, auth.js, components.js (layout y header), dashboard.js (carga de datos)
+            ? Accesibilidad: íconos Google Material; badges de estado en leyenda
+        -->
+</head>
+<body>
+    <div class="main-layout">
+        <div id="header-container"></div>
+        
+        <main class="content">
+            <div id="alert-container"></div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">home</span> Inicio - Resumen del Día</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <!-- Estadísticas principales -->
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 id="total-pacientes" class="text-3xl font-bold text-primary">0</h3>
+                                <p class="text-gray-600">Total Pacientes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 id="turnos-hoy" class="text-3xl font-bold text-accent">0</h3>
+                                <p class="text-gray-600">Turnos Hoy</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 id="consultas-mes" class="text-3xl font-bold text-success">0</h3>
+                                <p class="text-gray-600">Consultas del Mes</p>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 id="pacientes-atendidos" class="text-3xl font-bold text-warning">0</h3>
+                                <p class="text-gray-600">Atendidos Hoy</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Turnos de hoy -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos de Hoy</h3>
+                </div>
+                <div class="card-body">
+                    <div id="loading-turnos" class="text-center p-4">
+                        <span class="loading"></span> Cargando turnos...
+                    </div>
+                    
+                    <div id="turnos-container" class="hidden">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Horario</th>
+                                        <th>Paciente</th>
+                                        <th>DNI</th>
+                                        <th>Cobertura</th>
+                                        <th>Estado</th>
+                                        <th>1ra vez</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="turnos-tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="sin-turnos" class="text-center p-4 text-gray-500 hidden">
+                            No hay turnos programados para hoy
+                        </div>
+                        <div class="mt-4 text-sm text-gray-500">
+                            Leyenda de estados:
+                            <span class="badge badge-programado">Programado</span>
+                            <span class="badge badge-en-espera">En Espera</span>
+                            <span class="badge badge-atendido">Atendido</span>
+                            <span class="badge badge-ausente">Ausente</span>
+                            <span class="badge badge-cancelado">Cancelado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accesos rápidos -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">bolt</span> Accesos Rápidos</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <a href="turnos.html" class="btn btn-primary btn-lg">
+                            <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Agenda del Día
+                        </a>
+                        <button id="btn-buscar-paciente" class="btn btn-primary btn-lg">
+                            <span class="material-symbols-outlined" aria-hidden="true">search</span> Buscar Paciente
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <div id="footer-container"></div>
+    </div>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/dashboard.js"></script>
+    
+    <!-- Modal búsqueda rápida de paciente -->
+    <div id="modal-busqueda" class="hidden modal-overlay">
+        <div class="card" style="max-width: 500px; width: 90%;">
+            <div class="card-header">
+                <h3 class="card-title"><span class="material-symbols-outlined" aria-hidden="true">search</span> Búsqueda Rápida de Paciente</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="busqueda-input" class="form-label">Buscar por nombre, apellido o DNI</label>
+                    <input type="text" id="busqueda-input" class="form-input" placeholder="Ingresa nombre, apellido o DNI">
+                </div>
+                <div id="resultados-busqueda"></div>
+            </div>
+            <div class="card-footer">
+                <button id="btn-cerrar-modal" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

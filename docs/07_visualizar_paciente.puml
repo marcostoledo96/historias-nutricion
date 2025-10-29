@@ -1,0 +1,26 @@
+@startuml
+' Diagrama 07 - Visualizar paciente (búsqueda)
+title 07 - Visualizar paciente (búsqueda)
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Escribe nombre o documento en buscador
+Web -> Server : GET /pacientes?query={texto}
+Server -> DB : SELECT * FROM pacientes WHERE nombre LIKE ? OR documento = ?
+DB --> Server : lista_pacientes
+alt resultados encontrados
+  Server --> Web : HTTP 200 OK { pacientes[] }
+  Web --> Doctor : Muestra lista de coincidencias
+  Doctor -> Web : Selecciona paciente
+  Web -> Server : GET /pacientes/{id}
+  Server -> DB : SELECT * FROM pacientes WHERE id = ?
+  DB --> Server : registro_paciente
+  Server --> Web : HTTP 200 OK { paciente, historia_clinica_resumen }
+  Web --> Doctor : Muestra ficha y opciones (consultas, adjuntos)
+else sin resultados
+  Server --> Web : HTTP 204 No Content
+  Web --> Doctor : Muestra "Sin resultados"
+end
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+' Diagrama 11 - Visualizar consulta
+title 11 - Visualizar consulta
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Abre historial del paciente
+Web -> Server : GET /pacientes/{id}/consultas
+Server -> DB : SELECT * FROM consultas WHERE id_paciente = ? ORDER BY fecha DESC
+DB --> Server : consultas_lista
+alt hay consultas
+  Server --> Web : HTTP 200 OK { consultas[] }
+  Web --> Doctor : Muestra lista de consultas con resumen
+else sin consultas
+  Server --> Web : HTTP 204 No Content
+  Web --> Doctor : Muestra "Sin consultas registradas"
+end
+@enduml

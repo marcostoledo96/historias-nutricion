@@ -1,0 +1,1 @@
+SELECT NOW() as server_time, current_database() as db, inet_server_addr() as host, inet_server_port() as port;

@@ -1,0 +1,19 @@
+@startuml
+' Diagrama 08 - Crear consulta
+title 08 - Crear consulta (entrada en historia clínica)
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : En ficha de paciente, hace clic "Nueva consulta"
+Web -> Server : POST /pacientes/{id}/consultas { fecha, motivo, diagnostico, prescripciones, estudios }
+Server -> DB : INSERT INTO consultas (id_paciente, fecha, motivo, diagnostico, prescripciones, estudios)
+DB --> Server : id_consulta
+Server --> Web : HTTP 201 Created { id_consulta, mensaje: "Consulta guardada" }
+Web --> Doctor : Muestra nueva entrada en el historial
+alt error en datos
+  Server --> Web : HTTP 400 Bad Request { error: "Datos inválidos" }
+  Web --> Doctor : Muestra validación
+end
+@enduml

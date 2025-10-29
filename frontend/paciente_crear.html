@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+  ! Página: Crear Paciente
+  * Propósito: alta de paciente (puede venir desde Turnos con prefill y returnTo)
+  * Scripts: utils.js, auth.js, components.js, paciente_crear.js
+  ? Notas: validaciones mínimas (DNI/email); redirección a perfil o a Turnos
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear Paciente</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="main-layout">
+    <div id="header-container"></div>
+
+    <main class="content">
+      <div id="alert-container"></div>
+
+      <div class="card">
+        <div class="card-header"><h2 class="card-title">➕ Crear Paciente</h2></div>
+        <div class="card-body">
+          <form id="form-crear-paciente" autocomplete="off">
+            <!-- Grupo: Paciente -->
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Paciente</legend>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Nombre</label><input name="nombre" class="form-input" required autocomplete="off" autocapitalize="none" spellcheck="false" /></div>
+                <div class="form-group"><label class="form-label">Apellido</label><input name="apellido" class="form-input" required autocomplete="off" autocapitalize="none" spellcheck="false" /></div>
+                <div class="form-group"><label class="form-label">Documento</label><input name="dni" class="form-input" required autocomplete="off" inputmode="numeric" /></div>
+              </div>
+            </fieldset>
+
+            <!-- Grupo: Credenciales -->
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Credenciales</legend>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Cobertura</label><input name="cobertura" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">Plan</label><input name="plan" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">N° Afiliado</label><input name="numero_afiliado" class="form-input" autocomplete="off" /></div>
+              </div>
+            </fieldset>
+
+            <!-- Grupo: Clínica -->
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Clínica</legend>
+              <div class="form-row form-row-203050">
+                <div class="form-group"><label class="form-label">Sexo</label>
+                  <select name="sexo" class="form-select"><option value="masculino">Masculino</option><option value="femenino">Femenino</option><option value="otro">Otro</option></select>
+                </div>
+                <div class="form-group"><label class="form-label">Fecha de nacimiento</label>
+                  <div class="flex gap-2 items-center">
+                    <input name="fecha_nacimiento" type="date" class="form-input form-input-grow" autocomplete="off" />
+                    <span id="edad-texto-crear" class="text-muted" style="min-width: 90px;"></span>
+                  </div>
+                </div>
+                <div class="form-group"><label class="form-label">Enfermedades preexistentes</label><textarea name="enfermedades_preexistentes" class="form-input" rows="1"></textarea></div>
+              </div>
+              <div class="form-row form-row-3cols">
+                <div class="form-group"><label class="form-label">PA</label><input name="pa" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">PMin</label><input name="pmin" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">PMax</label><input name="pmax" class="form-input" autocomplete="off" /></div>
+              </div>
+              <div class="form-row form-row-3cols">
+                <div class="form-group"><label class="form-label">IMC</label><input name="imc" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">T</label><input name="t" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">P. Posible</label><input name="pposible" class="form-input" autocomplete="off" /></div>
+              </div>
+              <div class="form-row form-row-2cols">
+                <div class="form-group"><label class="form-label">Medicación</label><textarea name="medicacion" class="form-input" rows="1" autocomplete="off"></textarea></div>
+                <div class="form-group"><label class="form-label">Ejercicio físico</label><textarea name="ejercicio_fisico" class="form-input" rows="1" autocomplete="off"></textarea></div>
+              </div>
+            </fieldset>
+
+            <!-- Grupo: Contacto -->
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Contacto</legend>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Email</label><input name="email" type="email" class="form-input" autocomplete="off" autocapitalize="none" spellcheck="false" data-no-autofill="true" /></div>
+                <div class="form-group"><label class="form-label">Teléfono</label><input name="telefono" class="form-input" autocomplete="off" inputmode="tel" data-no-autofill="true" /></div>
+                <div class="form-group"><label class="form-label">Teléfono adicional</label><input name="telefono_adicional" class="form-input" autocomplete="off" inputmode="tel" data-no-autofill="true" /></div>
+              </div>
+            </fieldset>
+
+            <!-- Grupo: Datos extras -->
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Datos extras</legend>
+              <div class="form-row">
+                <div class="form-group"><label class="form-label">Localidad</label><input name="localidad" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">Dirección</label><input name="direccion" class="form-input" autocomplete="off" /></div>
+                <div class="form-group"><label class="form-label">Ocupación</label><input name="ocupacion" class="form-input" autocomplete="off" /></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group w-full"><label class="form-label">Observaciones</label><textarea name="observaciones" class="form-input" rows="3" autocomplete="off" spellcheck="false"></textarea></div>
+              </div>
+            </fieldset>
+
+            <div class="card-footer">
+              <button type="button" id="btn-cancelar-crear" class="btn btn-field">Cancelar</button>
+              <button type="submit" class="btn btn-primary btn-field">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <div id="footer-container"></div>
+  </div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/paciente_crear.js"></script>
+</body>
+</html>

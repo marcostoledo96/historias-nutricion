@@ -1,0 +1,20 @@
+@startuml
+' Diagrama 13 - Crear turno del día
+title 13 - Crear turno del día
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Click "Agregar turno" (hora, paciente, observaciones)
+Web -> Server : POST /turnos { id_paciente, hora, fecha, estado }
+Server -> DB : INSERT INTO turnos (...)
+DB --> Server : id_turno
+Server --> Web : HTTP 201 Created { id_turno, mensaje: "Turno creado" }
+Web --> Doctor : Actualiza vista de turnos
+
+alt datos inválidos
+  Server --> Web : HTTP 400 Bad Request { error: "Datos incompletos" }
+  Web --> Doctor : Muestra validación
+end
+@enduml

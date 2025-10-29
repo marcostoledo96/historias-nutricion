@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--
+  Vista: Crear Usuario
+  Propósito: Registro de usuarios (solo administradores) con rol.
+  Scripts asociados: js/utils.js, js/auth.js, js/registro.js
+-->
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear Usuario</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script>
+    (function(){
+      try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
+    })();
+  </script>
+</head>
+<body>
+  <button id="theme-toggle-standalone" class="theme-standalone-btn" aria-label="Alternar tema" title="Alternar tema">
+    <span class="material-symbols-outlined" aria-hidden="true">dark_mode</span>
+  </button>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header"><h1>Crear Usuario</h1><p>Solo administradores</p></div>
+      <div id="alert-container"></div>
+      <form id="form-registro">
+        <div class="form-group"><label class="form-label">Nombre completo</label><input name="nombre_completo" class="form-input" required/></div>
+        <div class="form-group"><label class="form-label">Email</label><input name="email" type="email" class="form-input" required/></div>
+        <div class="form-group"><label class="form-label">Contraseña</label><input name="password" type="password" class="form-input" required/></div>
+        <div class="form-group"><label class="form-label">Rol</label><select name="rol" class="form-select"><option value="doctor">Doctor</option><option value="admin">Admin</option></select></div>
+        <button class="btn btn-primary w-full" type="submit">Crear</button>
+      </form>
+      <div style="margin-top: 12px; text-align:center"><a href="index.html">Volver al Login</a></div>
+    </div>
+  </div>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/registro.js"></script>
+  <script>
+    (function(){
+      const btn = document.getElementById('theme-toggle-standalone');
+      if (!btn) return;
+      const icon = btn.querySelector('.material-symbols-outlined');
+      const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
+      const setIcon = () => {
+        const t = getTheme();
+        icon.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
+        btn.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+        btn.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+      };
+      setIcon();
+      btn.addEventListener('click', () => {
+        const current = getTheme();
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch(e) {}
+        setIcon();
+      });
+    })();
+  </script>
+</body>
+</html>

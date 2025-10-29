@@ -1,0 +1,22 @@
+@startuml
+' Diagrama 09 - Editar consulta
+title 09 - Editar consulta
+actor Doctor
+participant "Sistema Web" as Web
+participant "Servidor (API REST)" as Server
+database "Base de Datos" as DB
+
+Doctor -> Web : Abre consulta y edita campos
+Web -> Server : PUT /consultas/{id} { campo1, campo2, ... }
+Server -> DB : SELECT * FROM consultas WHERE id = ?
+DB --> Server : consulta_actual
+alt consulta existe
+  Server -> DB : UPDATE consultas SET ... WHERE id = ?
+  DB --> Server : OK
+  Server --> Web : HTTP 200 OK { mensaje: "Consulta actualizada" }
+  Web --> Doctor : Muestra confirmación
+else no encontrada
+  Server --> Web : HTTP 404 Not Found { error: "Consulta no encontrada" }
+  Web --> Doctor : Muestra error
+end
+@enduml
