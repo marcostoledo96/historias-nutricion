@@ -38,6 +38,13 @@ pool
             'Si usas Supabase, copia la cadena desde Project settings → Database → Connection string (formato db.<ref>.supabase.co).'
         );
 
+        if (typeof host === 'string') {
+          const visibleHost = JSON.stringify(host);
+          const charCodes = Array.from(host, (ch, idx) => `${idx}:${ch.charCodeAt(0)}`).join(' ');
+          console.error(`🔡 Host recibido (JSON.stringify): ${visibleHost}`);
+          console.error(`🔡 Códigos de caracteres del hostname: ${charCodes || '(vacío)'}`);
+        }
+
         if (typeof host === 'string' && host.includes('.supabase.co')) {
           const supabaseMatch = host.match(/^db\.([a-z0-9-]+)\.supabase\.co$/i);
           if (supabaseMatch) {

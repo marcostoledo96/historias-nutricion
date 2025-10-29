@@ -198,6 +198,7 @@ Turnos
 
 - Puerto 3000 ocupado: usa `netstat -ano | findstr :3000` y `Stop-Process -Id <PID> -Force` en PowerShell.
 - SSL/Supabase: si tu proveedor obliga SSL sin CA, está soportado con `PGSSLMODE=no-verify` o `NO_SSL=true` (evitar en prod).
+- `getaddrinfo ENOTFOUND`: ejecuta `node scripts/diagnose_db.js` desde `backend/` para ver el hostname, sus códigos de caracteres y probar la resolución DNS/TLS. Si el host contiene caracteres invisibles, aparecerán en la sección "Host (JSON.stringify)".
 - Usuario demo: ejecuta `node scripts\check_seed.js` si no puedes entrar con el usuario de pruebas.
 - Actualizar tu copia local desde VS Code:
   1. Abre la paleta de comandos (`Ctrl+Shift+P`) y ejecuta **“Git: Fetch”** para traer los commits remotos.
