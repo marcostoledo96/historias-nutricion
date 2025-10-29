@@ -12,7 +12,8 @@
     "db:migrate": "node migrate.js",
     "db:check-seed": "node scripts/check_seed.js",
     "admin:create": "node scripts/create_admin.js",
-  "user:create": "node scripts/create_user.js",
+    "user:create": "node scripts/create_user.js",
+    "db:diagnose": "node scripts/diagnose_db.js",
     "sql": "node run_sql.js",
     "migrate:patients:relax": "node run_sql.js ../database/migrations/20251019_relajar_requeridos_pacientes.sql",
     "test": "jest"
