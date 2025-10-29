@@ -3,6 +3,28 @@ const path = require('path');
 // * Cargar variables de entorno desde backend/.env (compatibilidad nodemon vs node directo)
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
+// * Sanitizar DATABASE_URL para tolerar cadenas copiadas desde dashboards (por ejemplo, `psql "postgresql://..."`).
+function sanitizeDatabaseUrl(rawDbUrl) {
+  if (!rawDbUrl) return rawDbUrl;
+
+  let candidate = String(rawDbUrl).trim();
+
+  // Si se copió el comando completo `psql "postgresql://..."`, extraemos solo la URL.
+  const match = candidate.match(/(postgres(?:ql)?:\/\/[^\s"']+)/i);
+  if (match) {
+    candidate = match[1];
+  }
+
+  if (
+    (candidate.startsWith('"') && candidate.endsWith('"')) ||
+    (candidate.startsWith("'") && candidate.endsWith("'"))
+  ) {
+    candidate = candidate.slice(1, -1);
+  }
+
+  return candidate.trim();
+}
+
 // * Parseo robusto de DATABASE_URL → objeto de config legible por pg
 function parseDatabaseUrl(dbUrl) {
   const u = new URL(dbUrl);
@@ -17,15 +39,16 @@ function parseDatabaseUrl(dbUrl) {
 
 function buildDatabaseConfig() {
   const rawDatabaseUrl = process.env.DATABASE_URL && process.env.DATABASE_URL.trim();
-  const hasConnectionString = Boolean(rawDatabaseUrl);
+  const sanitizedDatabaseUrl = sanitizeDatabaseUrl(rawDatabaseUrl);
+  const hasConnectionString = Boolean(sanitizedDatabaseUrl);
 
   let baseConfig;
   if (hasConnectionString) {
     try {
-      baseConfig = parseDatabaseUrl(rawDatabaseUrl);
+      baseConfig = parseDatabaseUrl(sanitizedDatabaseUrl);
     } catch (e) {
       console.warn('No se pudo parsear DATABASE_URL, usando connectionString directo. Motivo:', e.message);
-      baseConfig = { connectionString: rawDatabaseUrl };
+      baseConfig = { connectionString: sanitizedDatabaseUrl };
     }
   } else {
     baseConfig = {
@@ -62,6 +85,7 @@ function buildDatabaseConfig() {
 
   return {
     rawDatabaseUrl,
+    sanitizedDatabaseUrl,
     hasConnectionString,
     baseConfig,
     sslConfig,
