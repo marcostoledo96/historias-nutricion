@@ -37,7 +37,7 @@ AUTO_OPEN=0        # 1 para abrir navegador al iniciar
 Notas importantes:
 - La conexión implementa SSL robusto por defecto; para proveedores con certificados no verificados, se usa `rejectUnauthorized=false` cuando corresponde.
 - El servidor escucha `process.env.PORT || 3000` (recomendado: 3000 fijo para desarrollo local).
-- Si obtienes `getaddrinfo ENOTFOUND`, confirma que el hostname esté bien escrito (sin espacios) y que tu DNS pueda resolverlo. En Windows prueba `Resolve-DnsName db.tu-proyecto.supabase.co`; en macOS/Linux usa `nslookup`/`dig`. Si persiste, copia nuevamente la cadena desde Supabase → Project settings → Database → Connection string o ejecuta `npm run db:diagnose` dentro de `backend/` para ver un chequeo automático de DNS/TLS.
+- Si llegas a ver errores de sintaxis en `backend/db/config.js` con líneas que empiezan con `<<<<<<< HEAD` / `=======` / `>>>>>>>`, significa que quedaron **conflictos de merge sin resolver**. Para descartarlos y volver al archivo oficial del repositorio ejecuta `git restore backend/db/config.js` (o `git checkout -- backend/db/config.js` en Git <2.23) desde la carpeta raíz y luego reinicia `npm run dev`.
 
 ## Instalación
 
@@ -198,6 +198,7 @@ Turnos
 
 - Puerto 3000 ocupado: usa `netstat -ano | findstr :3000` y `Stop-Process -Id <PID> -Force` en PowerShell.
 - SSL/Supabase: si tu proveedor obliga SSL sin CA, está soportado con `PGSSLMODE=no-verify` o `NO_SSL=true` (evitar en prod).
+- `getaddrinfo ENOTFOUND`: ejecuta `node scripts/diagnose_db.js` desde `backend/` para ver el hostname, sus códigos de caracteres y probar la resolución DNS/TLS. Si el host contiene caracteres invisibles, aparecerán en la sección "Host (JSON.stringify)".
 - Usuario demo: ejecuta `node scripts\check_seed.js` si no puedes entrar con el usuario de pruebas.
 - Actualizar tu copia local desde VS Code:
   1. Abre la paleta de comandos (`Ctrl+Shift+P`) y ejecuta **“Git: Fetch”** para traer los commits remotos.

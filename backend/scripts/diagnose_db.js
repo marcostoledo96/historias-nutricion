@@ -26,6 +26,12 @@ const { buildDatabaseConfig } = require('../db/config');
   console.log(`• Puerto: ${portForLookup}`);
   console.log(`• Base de datos: ${databaseName}`);
   console.log(`• SSL requerido: ${sslEnabled ? 'sí' : 'no'}`);
+  if (typeof hostForLookup === 'string') {
+    const visibleHost = JSON.stringify(hostForLookup);
+    const charCodes = Array.from(hostForLookup, (ch, idx) => `${idx}:${ch.charCodeAt(0)}`).join(' ');
+    console.log(`• Host (JSON.stringify): ${visibleHost}`);
+    console.log(`• Host char codes: ${charCodes || '(vacío)'}`);
+  }
   console.log('');
 
   if (!hostForLookup) {
