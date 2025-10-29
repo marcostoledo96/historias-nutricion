@@ -16,10 +16,13 @@ const verificarAdmin = (req, res, next) => {
   }
 };
 
-// Middleware para verificar que sea doctor o admin
+// Middleware para verificar que sea doctor, admin o cuentas demo habilitadas para edición
+const ROLES_CON_PERMISOS_MEDICOS = new Set(['doctor', 'admin', 'demo']);
+
 const verificarDoctor = (req, res, next) => {
-  if (req.session && req.session.usuario && 
-      (req.session.usuario.rol === 'doctor' || req.session.usuario.rol === 'admin')) {
+  const rol = req.session?.usuario?.rol;
+
+  if (rol && ROLES_CON_PERMISOS_MEDICOS.has(rol)) {
     return next();
   } else {
     return res.status(403).json({ error: 'Acceso denegado. Se requieren permisos médicos.' });
