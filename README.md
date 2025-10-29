@@ -12,6 +12,7 @@ Aplicación web para gestionar pacientes, consultas y turnos. Backend en Node/Ex
 
 Crea un archivo `.env` dentro de `backend/` con:
 
+
 ```
 # Conexión a Postgres (elige 1 opción)
 DATABASE_URL=postgres://usuario:password@host:5432/basedatos
@@ -62,7 +63,6 @@ npm run db:migrate
 
 ```powershell
 # Desde backend/
-node run_sql.js ..\database\migrations\20251019_turnos_paciente_opcional.sql
 ```
 
 - Crear o promover un usuario admin:
