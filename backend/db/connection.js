@@ -2,64 +2,18 @@
 // ? Este módulo expone un Pool (pg) configurado a partir de .env o DATABASE_URL
 const { Pool } = require('pg');
 const dns = require('dns');
-const path = require('path');
+
+const { buildDatabaseConfig } = require('./config');
+
 // * Preferir IPv4 primero (mitiga ENOTFOUND/ETIMEDOUT en ciertos proveedores)
-try { dns.setDefaultResultOrder && dns.setDefaultResultOrder('ipv4first'); } catch {}
-// * Cargar .env desde backend explícitamente (evita depender del CWD)
-require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+try {
+  dns.setDefaultResultOrder && dns.setDefaultResultOrder('ipv4first');
+} catch {}
 
-// * Permitir configurar la conexión vía DATABASE_URL o por campos separados
-const hasConnectionString = !!process.env.DATABASE_URL;
-
-// * Parseo robusto de DATABASE_URL → objeto de config legible por pg
-function parseDatabaseUrl(dbUrl) {
-  try {
-    const u = new URL(dbUrl);
-    return {
-      host: u.hostname,
-      port: Number(u.port || 5432),
-      user: decodeURIComponent(u.username || 'postgres'),
-      password: decodeURIComponent(u.password || ''),
-      database: decodeURIComponent((u.pathname || '/postgres').slice(1)),
-    };
-  } catch (e) {
-    console.warn('No se pudo parsear DATABASE_URL, usando connectionString directo. Motivo:', e.message);
-    return { connectionString: dbUrl };
-  }
-}
-
-// * Config base final según haya o no DATABASE_URL
-const baseConfig = hasConnectionString
-  ? parseDatabaseUrl(process.env.DATABASE_URL)
-  : {
-      host: process.env.DB_HOST || 'localhost',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME || 'historias_clinicas',
-      port: Number(process.env.DB_PORT || 5432),
-    };
-
-// * SSL robusto por defecto (entornos gestionados como Supabase/Heroku)
-//   Se puede desactivar con NO_SSL=true o PGSSLMODE=disable; no-verify evita problemas con certificados
-const sslMode = String(process.env.PGSSLMODE || '').toLowerCase();
-const noSSL = String(process.env.NO_SSL || '').toLowerCase() === 'true' || sslMode === 'disable';
-const noVerify = sslMode === 'no-verify' || sslMode === 'prefer';
-
-const sslConfig = noSSL
-  ? false
-  : { require: true, rejectUnauthorized: !noVerify && false };
+const { poolConfig, safeConfig } = buildDatabaseConfig();
 
 // * Crear Pool de conexiones
-const pool = new Pool({
-  ...baseConfig,
-  ssl: sslConfig,
-  // Opciones de resiliencia
-  keepAlive: true,
-  keepAliveInitialDelayMillis: 10000,
-  idleTimeoutMillis: 30000, // cerrar conexiones ociosas tras 30s
-  connectionTimeoutMillis: 10000, // timeout de conexión inicial
-  max: Number(process.env.PGPOOL_MAX || 10),
-});
+const pool = new Pool(poolConfig);
 
 // Evitar crash si una conexión ociosa emite 'error' (p.ej., reinicio del servidor o pooler)
 pool.on('error', (err) => {
@@ -75,15 +29,28 @@ pool
   })
   .catch((err) => {
     try {
-      const safe = {
-        host: baseConfig.host,
-        port: baseConfig.port,
-        database: baseConfig.database,
-        user: baseConfig.user ? baseConfig.user.replace(/.*/,'***') : undefined, // no exponer
-        ssl: sslConfig ? { require: sslConfig.require, rejectUnauthorized: sslConfig.rejectUnauthorized } : false,
-      };
-      console.error('❌ Error conectando a PostgreSQL:', err.message, '\
-\nDetalles:', safe);
+      console.error('❌ Error conectando a PostgreSQL:', err.message, '\nDetalles:', safeConfig);
+      if (err.code === 'ENOTFOUND') {
+        const host = safeConfig.host || '(no definido)';
+        console.error(
+          'ℹ️  Sugerencias: verifica que el hostname sea correcto (sin espacios extra) y que tu conexión a Internet o DNS pueda resolverlo.',
+          `En Windows puedes probar con "Resolve-DnsName ${host}" y en macOS/Linux con "nslookup" o "dig".\n` +
+            'Si usas Supabase, copia la cadena desde Project settings → Database → Connection string (formato db.<ref>.supabase.co).'
+        );
+
+        if (typeof host === 'string' && host.includes('.supabase.co')) {
+          const supabaseMatch = host.match(/^db\.([a-z0-9-]+)\.supabase\.co$/i);
+          if (supabaseMatch) {
+            console.error(
+              `🔍 Host Supabase detectado con project ref "${supabaseMatch[1]}". Comprueba que coincida exactamente con el Project ref que muestra la consola de Supabase (Settings → General).`
+            );
+          } else {
+            console.error(
+              '🔍 El hostname parece de Supabase pero no respeta el patrón db.<project-ref>.supabase.co; revisa que no falten ni sobren letras.'
+            );
+          }
+        }
+      }
     } catch (_) {
       console.error('❌ Error conectando a PostgreSQL:', err.message);
     }

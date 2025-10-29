@@ -36,6 +36,7 @@ AUTO_OPEN=0        # 1 para abrir navegador al iniciar
 Notas importantes:
 - La conexión implementa SSL robusto por defecto; para proveedores con certificados no verificados, se usa `rejectUnauthorized=false` cuando corresponde.
 - El servidor escucha `process.env.PORT || 3000` (recomendado: 3000 fijo para desarrollo local).
+- Si llegas a ver errores de sintaxis en `backend/db/config.js` con líneas que empiezan con `<<<<<<< HEAD` / `=======` / `>>>>>>>`, significa que quedaron **conflictos de merge sin resolver**. Para descartarlos y volver al archivo oficial del repositorio ejecuta `git restore backend/db/config.js` (o `git checkout -- backend/db/config.js` en Git <2.23) desde la carpeta raíz y luego reinicia `npm run dev`.
 
 ## Instalación
 
@@ -198,6 +199,18 @@ Turnos
 - Puerto 3000 ocupado: usa `netstat -ano | findstr :3000` y `Stop-Process -Id <PID> -Force` en PowerShell.
 - SSL/Supabase: si tu proveedor obliga SSL sin CA, está soportado con `PGSSLMODE=no-verify` o `NO_SSL=true` (evitar en prod).
 - Usuario demo: ejecuta `node scripts\check_seed.js` si no puedes entrar con el usuario de pruebas.
+- Actualizar tu copia local desde VS Code:
+  1. Abre la paleta de comandos (`Ctrl+Shift+P`) y ejecuta **“Git: Fetch”** para traer los commits remotos.
+  2. En la barra de estado verifica que estás en la rama correcta (`work`, `main`, etc.). Si necesitas cambiar, usa **“Git: Checkout to...”**.
+  3. Abre una terminal integrada (`Ctrl+ñ` en teclado español) y ejecuta `git pull` para aplicar los cambios en tus archivos locales.
+  4. Si aparecen conflictos, VS Code mostrará indicadores en cada archivo; elige las versiones correctas y guarda.
+  5. Finalmente, corre `npm install` dentro de `backend/` si `package.json` o `package-lock.json` cambiaron y reinicia `npm run dev`.
+- Subir tus cambios a GitHub desde VS Code:
+  1. En la vista de **Source Control** (icono de ramas en la barra lateral izquierda) revisa los archivos modificados y confirma que sólo aparecen los esperados.
+  2. Escribe un mensaje corto y descriptivo en el cuadro **Message** (por ejemplo, “Documentar conexión a Supabase”) y presiona **Ctrl+Enter** para crear el commit.
+  3. Verifica que el commit aparezca en la pestaña **Commits** dentro de Source Control; si olvidaste algún archivo, realiza los ajustes y crea un nuevo commit.
+  4. Haz clic en el botón **Sync Changes** (o ejecuta “Git: Push”) para enviar tus commits a GitHub. Si es la primera vez en la rama, VS Code te preguntará si deseas publicarla; acepta.
+  5. Abre GitHub en el navegador y confirma que los cambios estén en tu repositorio. Desde allí puedes crear un Pull Request si necesitas revisión.
 
 ## Licencia
 
