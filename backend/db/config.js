@@ -4,6 +4,30 @@ const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 // * Parseo robusto de DATABASE_URL → objeto de config legible por pg
+function normalizeDatabaseUrl(rawUrl) {
+  if (!rawUrl) return rawUrl;
+
+  let cleaned = rawUrl.trim();
+
+  // Quitar comandos auxiliares que algunos paneles incluyen (por ej. `psql <url>`)
+  if (cleaned.toLowerCase().startsWith('psql ')) {
+    cleaned = cleaned.slice(4).trim();
+  }
+
+  // Remover comillas externas comunes al copiar desde CLI o paneles
+  if ((cleaned.startsWith("\"") && cleaned.endsWith("\"")) || (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+    cleaned = cleaned.slice(1, -1).trim();
+  }
+
+  // Extraer la primera URL postgres válida en caso de que haya texto extra alrededor
+  const match = cleaned.match(/postgres(?:ql)?:\/\/[^\s'\"]+/i);
+  if (match) {
+    cleaned = match[0];
+  }
+
+  return cleaned;
+}
+
 function parseDatabaseUrl(dbUrl) {
   const u = new URL(dbUrl);
   return {
@@ -17,15 +41,16 @@ function parseDatabaseUrl(dbUrl) {
 
 function buildDatabaseConfig() {
   const rawDatabaseUrl = process.env.DATABASE_URL && process.env.DATABASE_URL.trim();
+  const normalizedDatabaseUrl = normalizeDatabaseUrl(rawDatabaseUrl);
   const hasConnectionString = Boolean(rawDatabaseUrl);
 
   let baseConfig;
   if (hasConnectionString) {
     try {
-      baseConfig = parseDatabaseUrl(rawDatabaseUrl);
+      baseConfig = parseDatabaseUrl(normalizedDatabaseUrl || rawDatabaseUrl);
     } catch (e) {
       console.warn('No se pudo parsear DATABASE_URL, usando connectionString directo. Motivo:', e.message);
-      baseConfig = { connectionString: rawDatabaseUrl };
+      baseConfig = { connectionString: normalizedDatabaseUrl || rawDatabaseUrl };
     }
   } else {
     baseConfig = {
@@ -52,16 +77,22 @@ function buildDatabaseConfig() {
     max: Number(process.env.PGPOOL_MAX || 10),
   };
 
-  const safeConfig = {
-    host: baseConfig.host,
-    port: baseConfig.port,
-    database: baseConfig.database,
-    user: baseConfig.user ? baseConfig.user.replace(/.*/, '***') : undefined,
-    ssl: sslConfig ? { require: sslConfig.require, rejectUnauthorized: sslConfig.rejectUnauthorized } : false,
-  };
+  const safeConfig = baseConfig.connectionString
+    ? {
+        connectionString: '***',
+        ssl: sslConfig ? { require: sslConfig.require, rejectUnauthorized: sslConfig.rejectUnauthorized } : false,
+      }
+    : {
+        host: baseConfig.host,
+        port: baseConfig.port,
+        database: baseConfig.database,
+        user: baseConfig.user ? baseConfig.user.replace(/.*/, '***') : undefined,
+        ssl: sslConfig ? { require: sslConfig.require, rejectUnauthorized: sslConfig.rejectUnauthorized } : false,
+      };
 
   return {
     rawDatabaseUrl,
+    normalizedDatabaseUrl,
     hasConnectionString,
     baseConfig,
     sslConfig,
@@ -73,4 +104,5 @@ function buildDatabaseConfig() {
 module.exports = {
   buildDatabaseConfig,
   parseDatabaseUrl,
+  normalizeDatabaseUrl,
 };
